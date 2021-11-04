@@ -1,6 +1,6 @@
 _format_version: "1.1"
 services:
-- url: https://reqres.in/api/users?page=2
+- url: http://www.inf.fu-berlin.de:80/lehre/SS03/19560-P/Docs/JWSDP/tutorial/examples/jaxp/sax/samples/slideSample01.xml
   routes:
   - paths:
     - "/"
