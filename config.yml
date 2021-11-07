@@ -1,10 +1,18 @@
 _format_version: "1.1"
 services:
-- url: http://www.inf.fu-berlin.de:80/lehre/SS03/19560-P/Docs/JWSDP/tutorial/examples/jaxp/sax/samples/slideSample01.xml
-  routes:
-  - paths:
-    - "/"
-  plugins:
-  - name: key-checker
-    config:
-      apikey: mysecretconsumerkey
+  - url: https://www.mgm.gov.tr/FTPDATA/analiz/sonSOA.xml
+    routes:
+    - paths:
+      - "/"
+    plugins:
+    - name: key-checker
+      config:
+        apikey: mysecretconsumerkey
+  - url: http://www.inf.fu-berlin.de:80/lehre/SS03/19560-P/Docs/JWSDP/tutorial/examples/jaxp/sax/samples/slideSample01.xml
+    routes:
+    - paths:
+      - "/z"
+    plugins:
+    - name: key-checker
+      config:
+        apikey: mysecretconsumerkey

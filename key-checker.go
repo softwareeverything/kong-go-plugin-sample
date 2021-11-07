@@ -19,97 +19,102 @@ func New() interface{} {
 }
 
 func (conf Config) Response(kong *pdk.PDK) {
-	/*
-		kong.Log.Alert("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
-		headers, err := kong.Response.GetHeaders(1000)
-
-		if err != nil {
-			kong.Log.Err(err.Error())
-			return
-		}
-	*/
-	kong.Log.Alert("11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111")
 	contentType, err := kong.Response.GetHeader("Content-Type")
-
 	if err != nil {
 		kong.Log.Err(err.Error())
 		return
 	}
-	kong.Log.Alert("22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222")
-	if !strings.Contains(strings.ToLower(contentType), "application/xml") {
-		kong.Log.Err("Content-Type does not contain application/xml!")
+
+	if !(strings.Contains(strings.ToLower(contentType), "application/xml") || strings.Contains(strings.ToLower(contentType), "text/xml")) {
+		kong.Log.Err(contentType)
 		return
 	}
 
-	kong.Log.Alert("44444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444")
+	err = kong.Response.ClearHeader("Content-Length")
+	if err != nil {
+		kong.Log.Err(err.Error())
+		return
+	}
+
+	err = kong.Response.SetHeader("Content-Type", "text/json")
+	if err != nil {
+		kong.Log.Err(err.Error())
+		return
+	}
+
+	headers, err := kong.Response.GetHeaders(1000)
+	if err != nil {
+		kong.Log.Err(err.Error())
+		return
+	}
+
+	/*
+		// Marshal the map into a JSON string.
+		mJson, err := json.Marshal(headers)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+
+		jsonStr := string(mJson)
+		kong.Log.Alert(jsonStr)
+	*/
+
 	rawBody, err := kong.ServiceResponse.GetRawBody()
-	kong.Log.Alert(rawBody)
 	if err != nil {
 		kong.Log.Err(err.Error())
 		return
 	}
 
-	kong.Log.Alert("4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|4.1|")
+	var isGzipEncoded = false
 	contentEncoding, err := kong.Response.GetHeader("Content-Encoding")
+	if err == nil {
+		if strings.Contains(strings.ToLower(contentEncoding), "gzip") {
+			isGzipEncoded = true
+			gzipBody, err := gzip.NewReader(bytes.NewBuffer([]byte(rawBody)))
 
-	if err != nil {
-		kong.Log.Err(err.Error())
-		return
+			if err != nil {
+				kong.Log.Err(err.Error())
+				return
+			}
+
+			//kong.Log.Alert(gzipBody)
+			defer gzipBody.Close()
+
+			output, err := ioutil.ReadAll(gzipBody)
+			if err != nil {
+				kong.Log.Err(err.Error())
+				return
+			}
+
+			rawBody = string(output)
+		}
 	}
 
-	kong.Log.Alert("4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|4.2|")
-	if strings.Contains(strings.ToLower(contentEncoding), "gzip") {
-		kong.Log.Alert("4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|4.3|")
-		gzipBody, err := gzip.NewReader(bytes.NewBuffer([]byte(rawBody)))
-
-		if err != nil {
-			kong.Log.Err(err.Error())
-			return
-		}
-		kong.Log.Alert(gzipBody)
-		defer gzipBody.Close()
-
-		kong.Log.Alert("4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|4.4|")
-		output, err := ioutil.ReadAll(gzipBody)
-		if err != nil {
-			kong.Log.Err(err.Error())
-			return
-		}
-
-		rawBody = string(output)
-		kong.Log.Alert(rawBody)
-
-		kong.Log.Alert("4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|4.5|")
-	}
-
-	kong.Log.Alert("55555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555")
 	xml := strings.NewReader(rawBody)
-
 	json, err := xj.Convert(xml)
 	if err != nil {
 		kong.Log.Err(err.Error())
 		return
 	}
-	kong.Log.Alert("66666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666")
 
-	//headers["Content-Type"] = "application/json"
+	if isGzipEncoded {
+		var jsonBytes bytes.Buffer
+		gz := gzip.NewWriter(&jsonBytes)
 
-	/*
-		headers, err = kong.Response.GetHeaders(1000)
-
-		if err != nil {
+		if _, err := gz.Write([]byte(json.String())); err != nil {
 			kong.Log.Err(err.Error())
 			return
 		}
-	*/
 
-	kong.Log.Alert("77777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777")
-	kong.Log.Alert(json.String())
-	kong.Log.Alert("88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888")
-	// kong.Log.Alert(headers["Content-Type"])
-	x := make(map[string][]string)
-	x["Content-Type"] = append(x["Content-Type"], "application/json")
-	kong.Response.Exit(200, json.String(), x)
+		if err := gz.Close(); err != nil {
+			kong.Log.Err(err.Error())
+			return
+		}
 
-	kong.Log.Alert("99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999")
+		//kong.Log.Alert(jsonBytes.String())
+		kong.Response.Exit(200, jsonBytes.String(), headers)
+	} else {
+		kong.Response.Exit(200, json.String(), headers)
+	}
 }

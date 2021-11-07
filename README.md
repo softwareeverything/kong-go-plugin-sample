@@ -1,6 +1,6 @@
 # kong-go-plugin-xml-to-json-transformator
 
-This plugin basically transforms XML to JSON for Kong API Gateway on port 10000.
+This plugin basically transforms XML response data to JSON for Kong API Gateway on port 10000 (You can change port). At the same time, it can handle XML gzip encoded data to JSON gzip encoded data.
 
 ```
 docker build --no-cache -t kong-demo .
@@ -44,5 +44,3 @@ docker run -it --rm --name kong-go-plugins \
   -p 10000:8000 \
   kong-demo
 ```
-
-#FROM kong:2.0.4-alpine

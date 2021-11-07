@@ -1,4 +1,4 @@
-FROM kong/go-plugin-tool:2.0.4-alpine-latest AS builder
+FROM kong/go-plugin-tool:latest-alpine-latest AS builder
 
 RUN mkdir -p /tmp/key-checker/
 
@@ -22,6 +22,8 @@ COPY config.yml /tmp/config.yml
 
 USER root
 RUN chmod -R 777 /tmp
+#RUN chmod -R 777 /usr/local/bin
+#RUN chmod -R 777 /usr/local/kong
 RUN /usr/local/bin/go-pluginserver -version && \
     cd /tmp/go-plugins && \
     /usr/local/bin/go-pluginserver -dump-plugin-info key-checker
